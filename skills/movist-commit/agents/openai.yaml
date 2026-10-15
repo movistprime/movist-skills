@@ -1,0 +1,4 @@
+interface:
+  display_name: "Movist Commit"
+  short_description: "관련 변경만 커밋하고 실제 변경과 목적을 짧게 쓰는 Movist 커밋 절차"
+  default_prompt: "$movist-commit로 요청에 속한 변경만 커밋하고 제목과 본문을 명확하고 짧게 작성해 줘."

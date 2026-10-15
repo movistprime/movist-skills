@@ -1,0 +1,4 @@
+interface:
+  display_name: "Movist Code"
+  short_description: "기존 구현 재사용과 CPU·흐름 단순화를 우선하는 Movist 구현·리팩토링"
+  default_prompt: "$movist-code로 요청한 Movist 변경을 기존 흐름을 재사용하고 CPU 비용과 구조를 단순하게 유지하면서 구현해 줘."

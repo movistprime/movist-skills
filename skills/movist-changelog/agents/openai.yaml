@@ -1,0 +1,4 @@
+interface:
+  display_name: "Movist Pro 릴리스 노트"
+  short_description: "승인 기반으로 changelog와 배포용 HTML을 갱신합니다"
+  default_prompt: "Use $movist-changelog to prepare the next Movist Pro changelog and localized release notes."
