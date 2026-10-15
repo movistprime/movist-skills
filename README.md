@@ -8,7 +8,7 @@ Codex skill 모음입니다. 각 skill은 독립 폴더로 설치되지만, 서�
 
 - `movist-code`: 기존 구현 재사용과 CPU 비용을 우선하는 Movist 구현 절차
 - `movist-commit`: 관련 변경만 골라 커밋하는 Movist 커밋 절차
-- `commit-rebase-ff`: 커밋 후 로컬 `main`에 rebase하고 fast-forward 병합
+- `movist-ff-main`: 커밋 후 로컬 `main`에 rebase하고 fast-forward 병합
 - `movist-changelog`: 승인 기반 Movist Pro 다국어 릴리스 노트 절차
 
 `movist-code`가 필요할 때 참조하는 `movist-cpu-benchmark`는 선택 의존성이며
@@ -23,12 +23,12 @@ python3 "$CODEX_HOME/skills/.system/skill-installer/scripts/install-skill-from-g
   --repo moosoy/movist-skills \
   --path skills/movist-code \
          skills/movist-commit \
-         skills/commit-rebase-ff \
+         skills/movist-ff-main \
          skills/movist-changelog
 ```
 
 하나만 설치하려면 `--path`에 해당 폴더 하나만 지정합니다. 다만
-`movist-code`와 `commit-rebase-ff`는 `movist-commit`을 참조하므로 함께
+`movist-code`와 `movist-ff-main`은 `movist-commit`을 참조하므로 함께
 설치해야 전체 흐름이 동작합니다.
 
 설치기는 같은 이름의 대상 폴더를 덮어쓰지 않습니다. 이미 설치된 skill을
