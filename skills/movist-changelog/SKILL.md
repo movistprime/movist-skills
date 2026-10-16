@@ -61,6 +61,6 @@ description: Movist Pro 릴리스의 최종 소스와 의존성 상태를 확인
 4. 이전 릴리스 이하 이력과 EOF 보존
 5. 세 저장소의 status, staged/unstaged diff와 `git diff --check`
 
-`scripts/verify_release_notes.py --version <version> --previous-version <version>`으로 구조적 검사를 실행한다. 문서 작업만으로 제품 빌드를 실행하지 않는다.
+`scripts/verify_release_notes.py --version <version> --previous-version <previous-version>`으로 구조적 검사를 실행한다. 문서 작업만으로 제품 빌드를 실행하지 않는다.
 
 cleanroom과 www는 수정·검증한 상태로 사용자에게 보여 주되 기본 범위에서는 커밋하지 않는다. 각 저장소 커밋, `appcast.xml`, 업로드·배포와 push는 별도 명시 요청이 있을 때만 수행한다.

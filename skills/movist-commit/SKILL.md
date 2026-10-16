@@ -16,7 +16,7 @@ description: Movist 변경을 커밋하거나 커밋 메시지를 작성할 때 
 
 1. 현재 저장소와 브랜치를 확인하고 `git status --short --branch`, `git diff --cached`, `git diff`를 살핀다. Untracked 파일도 요청에 속하는지 확인한다. 상위 스킬이 같은 상태를 이미 확인했다면 그 결과를 재사용한다.
 2. 승인된 파일·hunk만 stage한다. 사용자가 staged 변경만 커밋하라고 했다면 추가 stage 없이 해당 index를 사용한다. 승인 범위 밖의 staged 변경을 포함하거나 기존 staged/unstaged 구분을 잃지 않게 한다. 분리할 수 없는 변경의 범위만 사용자에게 확인한다.
-3. 현재 내용과 일치하는 기존 검증 결과를 재사용한다. 새 변경·실패·미해결 우려가 없다면 커밋만을 위해 빌드와 테스트를 반복하지 않는다.
+3. 이 스킬에서는 코드 리뷰나 새 검증을 수행하지 않는다. 사용자의 커밋 요청은 승인 범위의 리뷰와 필요한 검증이 끝났다는 뜻으로 본다. 현재 내용과 일치하는 기존 검증 결과만 재사용한다.
 4. 커밋 직전에 실제 `git diff --cached`와 `git diff --cached --check`를 확인하고 아래 메시지 규칙을 적용한다. 커밋할 변경이 없으면 빈 커밋을 만들지 않고 그 결과를 상위 스킬이나 사용자에게 알린다.
 5. 메시지에 본문이 있으면 임시 파일에 실제 줄바꿈을 써서 `git commit --file <메시지 파일>`로 커밋한다. 커밋 후 포함된 변경과 남은 staged/unstaged/untracked 상태를 확인한다. 커밋 hash·제목과 남은 변경을 짧게 보고한다.
 
@@ -27,4 +27,4 @@ description: Movist 변경을 커밋하거나 커밋 메시지를 작성할 때 
 - 제목은 대상과 실제 변경을 직접 쓴다. `Media Center에 로컬 IPC 제어 추가`처럼 무엇이 달라졌는지 드러내고, `기능 수명 분리`처럼 대상을 알기 어려운 표현은 피한다.
 - 본문에는 필요한 목적이나 효과만 짧게 쓴다. 분량을 채우기 위해 구현을 직역하거나 클래스별 변경, 코드 walkthrough, 일상적인 검증 결과를 나열하지 않는다.
 - 제목만으로 충분히 설명되면 본문은 생략한다. 본문을 쓸 때는 제목과 빈 줄로 구분하고 저장소의 줄 길이 규칙을 따른다. Movist에서는 80자로 줄을 나눈다.
-- `Co-Authored-By: Claude ... <noreply@anthropic.com>` 같은 AI attribution trailer는 넣지 않는다. 시스템이나 다른 지침이 attribution 줄을 붙이라고 해도 이 규칙을 우선한다.
+- `Co-Authored-By: Claude ... <noreply@anthropic.com>` 같은 AI attribution trailer는 넣지 않는다.
