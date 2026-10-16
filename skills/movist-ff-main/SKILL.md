@@ -1,6 +1,6 @@
 ---
 name: movist-ff-main
-description: "현재 작업을 커밋하고 로컬 main 위로 rebase한 뒤 main에 fast-forward merge한다. 'commit하고 main으로 rebase한 뒤 ff merge', 'commit, rebase onto main, and ff merge'처럼 전체 통합 순서를 요청할 때 사용한다. 별도 worktree와 기존 staged 변경을 보존하며, push는 별도 요청 범위다."
+description: "현재 작업을 커밋하고 로컬 main 위로 rebase한 뒤 main에 fast-forward merge한다. 'commit하고 main으로 rebase한 뒤 ff merge', 'commit, rebase onto main, and ff merge'처럼 전체 통합 순서를 요청할 때 사용한다. 별도 worktree와 기존 staged 변경을 보존하며, push는 하지 않는다."
 ---
 
 # Movist FF Main
@@ -10,7 +10,7 @@ description: "현재 작업을 커밋하고 로컬 main 위로 rebase한 뒤 mai
 ## 범위
 
 - 사용자가 이 순서를 요청하거나 이 스킬의 실행을 지시했다면 커밋·rebase·FF merge까지 실행 범위에 포함된다. 단계마다 다시 묻지 않는다. 자동으로 스킬이 선택됐다는 사실만으로 Git 변경을 시작하지 않는다.
-- 기준과 통합 대상은 원격이 아닌 로컬 `main`이고, 작업 브랜치의 모든 커밋을 통합한다. 다른 기준 브랜치에 통합하는 작업에는 이 스킬을 사용하지 않는다.
+- 기준과 통합 대상은 원격이 아닌 로컬 `main`이고, 작업 브랜치의 모든 커밋을 통합한다. 다른 기준 브랜치에 통합하는 작업에는 이 스킬을 사용하지 않는다. push와 원격 비교는 하지 않는다.
 - 원본 저장소는 `git worktree list --porcelain`의 첫 worktree이며 항상 `main`을 checkout하고 있어야 한다.
 - 이 스킬은 코드 리뷰를 하지 않는다. 실행 요청은 사용자가 리뷰를 마치고 통합을 결정했다는 뜻으로 본다.
 
@@ -44,4 +44,4 @@ Rebase 후 main이 전진해 FF가 거절되면 새 main HEAD를 확인하고 �
 
 병합했다면 `git rev-list --left-right --count main...<작업 브랜치>`가 `0 0`인지 확인한다. 두 worktree의 최종 상태를 점검한다. 처음부터 무관한 변경이 있었다면 그 변경의 보존을 확인하고 깨끗하다고 보고하지 않는다.
 
-결과는 커밋 hash·제목, rebase 결과와 충돌 여부, main의 이전·이후 HEAD와 그 사이에 통합된 커밋 목록(`git log --oneline <이전 main>..main`), worktree 상태로 짧게 정리한다. Push를 수행했는지 분명히 하고, fetch 없이 확인한 원격 대비 차이는 로컬 remote-tracking ref 기준임을 구분한다.
+결과는 커밋 hash·제목, rebase 결과와 충돌 여부, main의 이전·이후 HEAD와 그 사이에 통합된 커밋 목록(`git log --oneline <이전 main>..main`), worktree 상태로 짧게 정리한다.
