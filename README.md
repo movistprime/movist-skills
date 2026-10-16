@@ -19,8 +19,9 @@ Codex skill 모음입니다. 각 skill은 독립 폴더로 설치되지만, 서�
 Codex의 `skill-installer`로 네 skill을 한 번에 설치합니다.
 
 ```sh
+CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 python3 "$CODEX_HOME/skills/.system/skill-installer/scripts/install-skill-from-github.py" \
-  --repo moosoy/movist-skills \
+  --repo movistprime/movist-skills \
   --path skills/movist-code \
          skills/movist-commit \
          skills/movist-ff-main \
