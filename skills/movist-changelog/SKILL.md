@@ -35,13 +35,10 @@ description: Movist Pro 릴리스의 최종 소스와 의존성 상태를 확인
 
 초안을 제시할 때 “승인하면 이 `CHANGELOG.md`만 커밋하고 다국어 HTML 단계로 진행한다”고 명시한다. 사용자가 그 메시지에 현재 초안을 가리켜 “승인”, “이대로”, “좋아”, “커밋해”라고 답한 경우에만 승인과 커밋 지시로 본다. 일반적인 확인 표현이나 수정 의견은 승인이 아니다. 원문을 고치고 다시 검증한 뒤 새 승인을 기다린다.
 
-승인 뒤에는 다시 상태를 읽어 사용자가 본 초안과 현재 파일이 같은지 확인한다. 최근 `git log`의 메시지 형식과 저장소 지침 파일(`AGENTS.md`, `CLAUDE.md` 등)을 따르고, 승인된 `CHANGELOG.md` 변경만 커밋한다. 한 파일 안에 승인 범위 밖 변경이 섞여 안전하게 분리할 수 없으면 그때만 사용자에게 묻는다.
+승인 뒤에는 다시 상태를 읽어 사용자가 본 초안과 현재 파일이 같은지 확인한다. [movist-commit](../movist-commit/SKILL.md)을 읽고 승인된 `CHANGELOG.md` 변경만 커밋하며, 다음을 더한다.
 
-- unrelated staged 변경이 없으면 승인된 hunk만 stage한다.
 - unrelated staged 변경이 있으면 그 index diff를 기록하고 `git commit --only -- CHANGELOG.md`처럼 경로를 한정해 커밋한다. 커밋 전에는 `git diff HEAD -- CHANGELOG.md`가 승인본과 같은지 확인하고, 커밋 뒤에는 unrelated staged diff가 이전과 같은지 대조한다.
-- 다른 staged 변경을 함께 커밋하거나 기존 staged/unstaged 구분을 바꾸지 않는다.
-
-커밋 직전에 실제 커밋 후보 diff와 whitespace를 확인한다. rebase, merge, push, amend는 요청 없이는 하지 않는다. 커밋 명령이 timeout이나 불명확한 오류를 반환하면 재시도하기 전에 HEAD와 최근 로그를 확인한다. 커밋 뒤 hash·제목, 실제 커밋 내용과 남은 변경을 확인한다.
+- 커밋 명령이 timeout이나 불명확한 오류를 반환하면 재시도하기 전에 HEAD와 최근 로그를 확인한다.
 
 ## 3. 커밋된 원문으로 cleanroom과 www 갱신
 
@@ -49,18 +46,15 @@ description: Movist Pro 릴리스의 최종 소스와 의존성 상태를 확인
 
 영어, 한국어, `zh-Hans`, `zh-Hant` 네 언어를 같은 항목 수와 순서로 작성한다. 영어·중국어 용어는 각 locale의 실제 앱 문자열과 `Docs/Localization.md`에서 확인한다.
 
-- cleanroom에 `MovistPro_<version>.{ko,en,zh-Hans,zh-Hant}.html` 네 파일을 만든다. 직전 릴리스 파일의 구조와 이전 이력을 보존하고 다운로드 링크는 넣지 않는다.
+- cleanroom에 `MovistPro_<version>.{ko,en,zh-Hans,zh-Hant}.html` 네 파일을 만든다. 직전 릴리스 파일을 그대로 복사하고 맨 위에 새 버전 절만 추가하며, 다운로드 링크는 넣지 않는다.
 - www의 `changelog.html`, `ko/changelog.html`, `zh-Hans/changelog.html`, `zh-Hant/changelog.html` 맨 위에 새 버전을 추가한다. 주변 릴리스의 DMG URL 형식과 locale별 다운로드 라벨을 그대로 따른다.
 - 기존 파일의 UTF-8, 들여쓰기, 줄바꿈과 EOF 형식을 보존한다.
 
-검증에는 다음을 포함한다.
+`scripts/verify_release_notes.py --version <version> --previous-version <previous-version>`으로 구조적 검사를 실행한다. 스크립트는 커밋된 한국어 항목과 한국어 HTML의 일치, locale별 cleanroom/www 일치와 네 언어 항목 수, 대상 버전 DMG URL과 다운로드 라벨, 이전 이력과 EOF 보존을 검사하므로 이 항목들은 다시 직접 확인하지 않는다. 스크립트가 통과하면 다음만 직접 확인한다.
 
-1. 커밋된 한국어 항목과 한국어 HTML의 항목 수·순서·본문 일치
-2. locale별 cleanroom/www 본문 일치와 네 언어 항목 수 일치
-3. 실제 앱 용어, 대상 버전 DMG URL과 다운로드 라벨 확인
-4. 이전 릴리스 이하 이력과 EOF 보존
-5. 세 저장소의 status, staged/unstaged diff와 `git diff --check`
+1. 각 locale의 메뉴·환경설정·기능 이름이 실제 앱 문자열과 맞는지
+2. 세 저장소의 status, staged/unstaged diff와 `git diff --check`
 
-`scripts/verify_release_notes.py --version <version> --previous-version <previous-version>`으로 구조적 검사를 실행한다. 문서 작업만으로 제품 빌드를 실행하지 않는다.
+문서 작업만으로 제품 빌드를 실행하지 않는다.
 
 cleanroom과 www는 수정·검증한 상태로 사용자에게 보여 주되 기본 범위에서는 커밋하지 않는다. 각 저장소 커밋, `appcast.xml`, 업로드·배포와 push는 별도 명시 요청이 있을 때만 수행한다.

@@ -258,7 +258,7 @@ def main() -> int:
         decode_utf8(changelog_bytes, f"CHANGELOG {args.changelog_ref}"), args.version
     )
 
-    locale_counts: dict[str, int] = {}
+    locale_items: dict[str, list[str]] = {}
     for locale, (web_relative_from_root, download_label) in LOCALES.items():
         clean_path = args.cleanroom / f"MovistPro_{args.version}.{locale}.html"
         previous_path = (
@@ -312,18 +312,14 @@ def main() -> int:
         if not expected_link.search(web_section):
             fail(f"{locale}: missing expected download link or label")
 
-        locale_counts[locale] = len(clean_items)
+        locale_items[locale] = clean_items
         print(f"{locale}: {len(clean_items)} items, cleanroom/www match")
 
+    locale_counts = {locale: len(items) for locale, items in locale_items.items()}
     if len(set(locale_counts.values())) != 1:
         fail(f"locale item counts differ: {locale_counts}")
 
-    korean_path = args.cleanroom / f"MovistPro_{args.version}.ko.html"
-    _, korean_text = read_utf8(korean_path)
-    _, _, _, korean_items = release_block(
-        korean_text, args.version, str(korean_path)
-    )
-    if korean_items != source_items:
+    if locale_items["ko"] != source_items:
         fail("Korean HTML does not match the approved CHANGELOG")
 
     print("Korean HTML matches the approved CHANGELOG")
