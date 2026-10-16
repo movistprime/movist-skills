@@ -41,7 +41,7 @@ description: Movist Pro 릴리스의 최종 소스와 의존성 상태를 확인
 - www의 `changelog.html`, `ko/changelog.html`, `zh-Hans/changelog.html`, `zh-Hant/changelog.html` 맨 위에 새 버전을 추가한다. 주변 릴리스의 DMG URL 형식과 locale별 다운로드 라벨을 그대로 따른다.
 - 기존 파일의 UTF-8, 들여쓰기, 줄바꿈과 EOF 형식을 보존한다.
 
-`scripts/verify_release_notes.py --version <version> --previous-version <previous-version>`으로 구조적 검사를 실행한다. 스크립트는 `CHANGELOG.md`의 한국어 항목과 한국어 HTML의 일치, locale별 cleanroom/www 일치와 네 언어 항목 수, 대상 버전 DMG URL과 다운로드 라벨, 이전 이력과 EOF 보존을 검사하므로 이 항목들은 다시 직접 확인하지 않는다. 스크립트가 통과하면 다음만 직접 확인한다.
+제품 저장소 루트에서 이 스킬의 `scripts/verify_release_notes.py --version <version> --previous-version <previous-version>`으로 구조적 검사를 실행한다. 기본 경로와 다르면 `--changelog`, `--cleanroom`, `--www`를 넘긴다. 스크립트는 `CHANGELOG.md`의 한국어 항목과 한국어 HTML의 일치, locale별 cleanroom/www 일치와 네 언어 항목 수, 대상 버전 DMG URL과 다운로드 라벨, 이전 이력과 EOF 보존을 검사하므로 이 항목들은 다시 직접 확인하지 않는다. 스크립트가 통과하면 다음만 직접 확인한다.
 
 1. 각 locale의 메뉴·환경설정·기능 이름이 실제 앱 문자열과 맞는지
 2. 세 저장소의 status, staged/unstaged diff와 `git diff --check`
