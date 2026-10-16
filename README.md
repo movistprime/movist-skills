@@ -29,8 +29,8 @@ npx skills add movistprime/movist-skills --skill '*' -g
 ```
 
 하나만 설치하려면 `--skill <name>`을 지정합니다. 다만
-`movist-code`, `movist-ff-main`, `movist-changelog`는 `movist-commit`을
-참조하므로 함께 설치해야 전체 흐름이 동작합니다.
+`movist-code`와 `movist-ff-main`은 `movist-commit`을 참조하므로 함께
+설치해야 전체 흐름이 동작합니다.
 
 설치된 skill은 Agent Skills CLI로 갱신합니다.
 

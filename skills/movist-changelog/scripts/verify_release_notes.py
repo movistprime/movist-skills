@@ -226,11 +226,6 @@ def main() -> int:
         "--changelog", type=Path, default=Path.cwd() / "CHANGELOG.md"
     )
     parser.add_argument(
-        "--changelog-ref",
-        default="HEAD",
-        help="Approved Git revision, or WORKTREE only while developing a draft",
-    )
-    parser.add_argument(
         "--cleanroom",
         type=Path,
         default=Path.home() / "devel/Movist/Support/cleanroom",
@@ -243,19 +238,11 @@ def main() -> int:
     args.cleanroom = args.cleanroom.expanduser().resolve()
     args.www = args.www.expanduser().resolve()
 
-    changelog_repo = git_root(args.changelog)
     cleanroom_repo = git_root(args.cleanroom)
     www_repo = git_root(args.www)
 
-    if args.changelog_ref == "WORKTREE":
-        changelog_bytes = args.changelog.read_bytes()
-    else:
-        changelog_relative = relative_to_repo(args.changelog, changelog_repo)
-        changelog_bytes = git_ref_bytes(
-            changelog_repo, args.changelog_ref, changelog_relative
-        )
     source_items = markdown_items(
-        decode_utf8(changelog_bytes, f"CHANGELOG {args.changelog_ref}"), args.version
+        decode_utf8(args.changelog.read_bytes(), str(args.changelog)), args.version
     )
 
     locale_items: dict[str, list[str]] = {}
@@ -320,9 +307,9 @@ def main() -> int:
         fail(f"locale item counts differ: {locale_counts}")
 
     if locale_items["ko"] != source_items:
-        fail("Korean HTML does not match the approved CHANGELOG")
+        fail("Korean HTML does not match CHANGELOG")
 
-    print("Korean HTML matches the approved CHANGELOG")
+    print("Korean HTML matches CHANGELOG")
     print("All structural release-note checks passed")
     return 0
 
