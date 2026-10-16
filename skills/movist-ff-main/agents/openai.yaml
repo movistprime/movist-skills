@@ -1,3 +1,4 @@
 interface:
   display_name: "Movist FF Main"
   short_description: "현재 작업을 커밋하고 main에 rebase 후 fast-forward 병합"
+  default_prompt: "$movist-ff-main로 커밋후 main으로 merge"
