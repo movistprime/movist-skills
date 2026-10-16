@@ -1,7 +1,7 @@
 # Movist Skills
 
 Movist 개발, 커밋, 브랜치 통합과 Movist Pro 릴리스 노트 작업에 쓰는
-Codex skill 모음입니다. 각 skill은 독립 폴더로 설치되지만, 서로 참조하는
+Agent Skills 모음입니다. 각 skill은 독립 폴더로 설치되지만, 서로 참조하는
 작업 흐름이 있어 네 개를 함께 설치하는 방식을 권장합니다.
 
 ## 포함된 skill
@@ -16,28 +16,34 @@ Codex skill 모음입니다. 각 skill은 독립 폴더로 설치되지만, 서�
 
 ## 설치
 
-Codex의 `skill-installer`로 네 skill을 한 번에 설치합니다.
+Agent Skills CLI가 지원하는 agent와 설치할 skill을 대화식으로 선택합니다.
 
 ```sh
-CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
-python3 "$CODEX_HOME/skills/.system/skill-installer/scripts/install-skill-from-github.py" \
-  --repo movistprime/movist-skills \
-  --path skills/movist-code \
-         skills/movist-commit \
-         skills/movist-ff-main \
-         skills/movist-changelog
+npx skills add movistprime/movist-skills
 ```
 
-하나만 설치하려면 `--path`에 해당 폴더 하나만 지정합니다. 다만
+네 skill을 사용자 범위에 설치하려면 다음과 같이 실행합니다.
+
+```sh
+npx skills add movistprime/movist-skills --skill '*' -g
+```
+
+하나만 설치하려면 `--skill <name>`을 지정합니다. 다만
 `movist-code`와 `movist-ff-main`은 `movist-commit`을 참조하므로 함께
 설치해야 전체 흐름이 동작합니다.
 
-설치기는 같은 이름의 대상 폴더를 덮어쓰지 않습니다. 이미 설치된 skill을
-갱신할 때는 기존 폴더를 직접 백업하거나 제거한 뒤 다시 설치하세요. 설치를
-마치면 Codex를 다시 시작해야 새 skill이 인식됩니다.
+설치된 skill은 Agent Skills CLI로 갱신합니다.
+
+```sh
+npx skills update movist-code movist-commit movist-ff-main movist-changelog -g
+```
+
+각 폴더의 `SKILL.md`는 공통 Agent Skills 형식입니다. `agents/openai.yaml`은
+OpenAI agent의 표시 metadata이며 skill 동작은 이 파일에 의존하지 않습니다.
 
 ## 실행 환경
 
+- Agent Skills CLI를 실행할 Node.js와 npm
 - Git CLI
 - `movist-changelog` 검증 스크립트용 Python 3.10 이상
 - `movist-changelog`가 사용하는 Movist, cleanroom, www Git 저장소

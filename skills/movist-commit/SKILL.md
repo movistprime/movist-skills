@@ -5,7 +5,7 @@ description: Movist 변경을 커밋하거나 커밋 메시지를 작성할 때 
 
 # Movist 커밋
 
-요청에 속한 변경만 커밋하고, 커밋 메시지는 실제 staged diff에 맞춰 쓴다. 사용자의 지시와 작업 저장소의 `AGENTS.md`를 따른다.
+요청에 속한 변경만 커밋하고, 커밋 메시지는 실제 staged diff에 맞춰 쓴다. 사용자의 지시와 작업 저장소의 지침 파일(`AGENTS.md`, `CLAUDE.md` 등)을 따른다.
 
 ## 승인 범위
 
