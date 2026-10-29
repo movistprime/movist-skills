@@ -35,6 +35,10 @@ description: Movist의 기능 구현, 확인된 버그 수정, 리팩토링에 �
 - 변경 요약은 대상과 실제 변경을 직접 쓴다. 예를 들어 “재생 세션 소유권 주석 정리” 대신 “PlaybackSession 주석 정리”라고 쓴다. 소유권·수명·경계 자체를 설명할 때는 누가 무엇을 생성·보관·해제하거나 변경하는지 구체적으로 적는다.
 - 커밋을 요청받으면 [movist-commit](../movist-commit/SKILL.md)을 읽고 커밋 절차와 메시지 규칙을 따른다.
 
+## 문서 갱신
+
+- 코드 변경이 public·package 계약, caller에게 보이는 동작이나 wire 계약을 바꾸면 그 owner 문서(`Docs/3.0`의 해당 `*API.md`·`*Spec.md`)를 그 문서의 수준으로 고치고 다른 문서는 건드리지 않는다. 상태나 완료 조건이 바뀌면 `Docs/3.0/Migration-Plan.md`의 해당 영역 행을 함께 고친다. 검증 결과는 작업 보고에만 쓰고, 남는 결함·한계는 `Docs/Issues`에 `처리` 값과 함께 적는다.
+
 ## 주석
 
 - 코드에서 드러나는 동작을 되풀이하는 주석은 추가하지 않는다. lock, cancellation, ownership, 외부·플랫폼 동작, API 계약, 호환성처럼 코드만으로 알기 어려운 제약과 이유는 보존하거나 설명한다. 저작권 헤더, shebang, formatter/linter 지시문은 원래 형식을 따른다.

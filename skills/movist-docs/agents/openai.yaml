@@ -1,4 +1,4 @@
 interface:
   display_name: "Movist Docs"
-  short_description: "README 문서 규칙 기준으로 Movist 문서의 정합성·중복·경계·디테일 정리"
+  short_description: "README 문서 규칙 기준의 Movist 문서 정리, API 문서 표 변환, 작업 추적 문서 이전"
   default_prompt: "$movist-docs로 지정한 Movist 문서를 README 문서 절의 역할·위계 규칙에 맞춰 정리해 줘. 상태 주장은 source로 확인하고, 결정이 필요한 것만 보고해 줘."

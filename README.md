@@ -2,7 +2,7 @@
 
 Movist 개발, 커밋, 브랜치 통합과 Movist Pro 릴리스 노트 작업에 쓰는
 Agent Skills 모음입니다. 각 skill은 독립 폴더로 설치되지만, 서로 참조하는
-작업 흐름이 있어 네 개를 함께 설치하는 방식을 권장합니다.
+작업 흐름이 있어 다섯 개를 함께 설치하는 방식을 권장합니다.
 
 ## 포함된 skill
 
@@ -10,6 +10,7 @@ Agent Skills 모음입니다. 각 skill은 독립 폴더로 설치되지만, 서
 - `movist-commit`: 관련 변경만 골라 커밋하는 Movist 커밋 절차
 - `movist-ff-main`: 커밋 후 로컬 `main`에 rebase하고 fast-forward 병합
 - `movist-changelog`: 승인 기반 Movist Pro 다국어 릴리스 노트 절차
+- `movist-docs`: README 문서 규칙 기준의 Movist 문서 정리와 API 문서 변환 절차
 
 `movist-code`가 필요할 때 참조하는 `movist-cpu-benchmark`는 선택 의존성이며
 이 저장소에는 포함하지 않습니다.
@@ -22,7 +23,7 @@ Agent Skills CLI가 지원하는 agent와 설치할 skill을 대화식으로 선
 npx skills add movistprime/movist-skills
 ```
 
-네 skill을 사용자 범위에 설치하려면 다음과 같이 실행합니다.
+다섯 skill을 사용자 범위에 설치하려면 다음과 같이 실행합니다.
 
 ```sh
 npx skills add movistprime/movist-skills --skill '*' -g
@@ -35,7 +36,7 @@ npx skills add movistprime/movist-skills --skill '*' -g
 설치된 skill은 Agent Skills CLI로 갱신합니다.
 
 ```sh
-npx skills update movist-code movist-commit movist-ff-main movist-changelog -g
+npx skills update movist-code movist-commit movist-ff-main movist-changelog movist-docs -g
 ```
 
 각 폴더의 `SKILL.md`는 공통 Agent Skills 형식입니다. `agents/openai.yaml`은
