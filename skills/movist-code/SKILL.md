@@ -37,7 +37,7 @@ description: Movist의 기능 구현, 확인된 버그 수정, 리팩토링에 �
 
 ## 문서 갱신
 
-- 코드 변경이 public·package 계약, caller에게 보이는 동작이나 wire 계약을 바꾸면 그 owner 문서(`Docs/3.0`의 해당 `*API.md`·`*Spec.md`)를 그 문서의 수준으로 고치고 다른 문서는 건드리지 않는다. 상태나 완료 조건이 바뀌면 `Docs/3.0/Migration-Plan.md`의 해당 영역 행을 함께 고친다. 검증 결과는 작업 보고에만 쓰고, 남는 결함·한계는 `Docs/Issues`에 `처리` 값과 함께 적는다.
+- 코드 변경이 public·package 계약, caller에게 보이는 동작이나 wire 계약을 바꾸면 그 owner 문서(`Docs/3.0`의 해당 `*API.md`·`*Spec.md`)를 그 문서의 수준으로 고치고 다른 문서는 건드리지 않는다. 상태나 완료 조건이 바뀌면 `Docs/3.0/Migration-Plan.md`의 해당 영역 행을 함께 고친다. 검증 결과는 작업 보고에만 쓰고, 남는 결함·한계는 `Docs/Issues`에 `처리` 값과 함께 적는다. Issues 항목을 고쳤으면 같은 커밋에서 그 항목을 `해결된 항목` 표로 옮기고 커밋 hash는 적지 않는다.
 
 ## 주석
 
