@@ -1,0 +1,3 @@
+#!/bin/sh
+# 영어 원문이 바뀌었는데 ko/ 번역본이 그대로면 커밋을 막는다.
+exec python3 "$(git rev-parse --show-toplevel)/scripts/check_ko.py"

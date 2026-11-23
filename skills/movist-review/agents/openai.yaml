@@ -1,0 +1,4 @@
+interface:
+  display_name: "Movist Review"
+  short_description: "정해진 차단 기준으로 Movist 변경을 판정하고 재리뷰는 바뀐 줄만 보는 리뷰"
+  default_prompt: "$movist-review로 stage한 변경을 리뷰해 줘."

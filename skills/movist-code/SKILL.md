@@ -1,52 +1,94 @@
 ---
 name: movist-code
-description: Movist의 기능 구현, 확인된 버그 수정, 리팩토링에 사용한다. 기존 구현을 재사용하고 CPU 비용과 코드 흐름을 우선한다. 원인 조사·코드 리뷰·성능 측정만 하는 요청에는 사용하지 않는다.
+description: Implement features, fix confirmed bugs, and refactor in Movist. Build only what was asked with the simplest control flow, reuse existing code first, and keep playback CPU cost down. Use movist-review to review a change. Not for cause investigation or performance measurement alone.
 ---
 
-# Movist 코드 구현·리팩토링
+# Movist implementation and refactoring
 
-요청한 동작을 완성하면서 불필요한 실행 비용과 구조를 줄인다. 작업 저장소의 지침 파일(`AGENTS.md`, `CLAUDE.md` 등)과 사용자가 지정한 변경·검증 범위를 따른다.
+Finish everything the request needs with the least new code. Follow the working repository's instruction files (`AGENTS.md`, `CLAUDE.md`, and so on) and the edit and verification scope the user set.
 
-## 기존 흐름에서 해결
+## Terms
 
-- 영향을 받는 호출 경로와 데이터·상태의 소유자를 확인한다. 기존 함수, 라이브러리 기능, 기본값, 비동기 전달과 fallback이 같은 일을 하는지 먼저 살펴보고 재사용한다.
-- 추상화, guard, 호환 계층, retry, cache는 현재 요구나 실제 실행 조건, 유지해야 할 계약으로 필요성을 설명할 수 있어야 한다. 가상의 사용처나 미래 플랫폼을 위한 구조는 추가하지 않는다. 실제 중복을 줄이고 책임을 분명히 하는 공통화는 사용한다.
-- 기존 Movist와 같은 동작을 요청받았다면 저장소의 `__original/`에서 해당 기능의 설정, 동작 순서와 상태 전이를 확인한다. 현재 구현에 맞게 옮기되 사용자가 요구한 동작을 빠뜨리거나 넓히지 않는다.
+- The user: the person who gave you the task.
+- End user: the person using the app.
+- Playback hot path: code that runs tens to hundreds of times per second while media plays.
+- Simpler control flow: fewer branches, states, call layers, and thread or actor hops.
 
-## CPU 비용과 흐름 단순화
+## Scope
 
-- 재생 경로의 우선순위는 실제 앱의 CPU 부하 감소 → 코드 흐름 단순화 → 코드량 감소 → 검수 편의다. 기능의 정확성과 수명·동시성 계약을 유지하면서 이 순서로 판단한다. 줄 수를 줄이려고 재생 중 반복되는 경로의 복사, 할당, 스레드·actor 이동, 동기화, callback 작업을 늘리거나 무관한 책임을 한 객체에 모으거나 세미콜론·축약을 쓰지 않는다.
-- CPU 최적화의 가치는 호출 빈도와 호출당 비용이 실제 앱의 CPU 부하에 미치는 영향으로 판단한다. 재생 중 초당 수십~수백 회 반복되는 작업처럼 누적 비용이 큰 경로를 우선한다. 새 API나 라이브러리 경로가 더 효율적이라고 가정하지 않는다.
-- 일시적인 비용 절감이나 실제 앱에서 매우 미미한 성능 개선을 위해 코드 흐름을 복잡하게 하거나 책임·소유 경계를 흐리지 않는다. 컴파일러가 최적화할 수 있는 함수 inline이나 계산 축약을 직접 하거나, 분리돼야 할 함수 계층을 한 함수로 합치는 것이 그 예다. seek·영상 시작·종료 시 객체 초기화 비용은 일시적 비용의 예시다.
-- 중복 기본값, 원래 상태에서 계산할 수 있는 별도 상태, 얽힌 Bool, 전달만 하는 wrapper와 불필요한 호출 단계를 줄인다.
-- 숨긴 UI나 꺼진 기능의 불필요한 반복 작업을 줄일 때는 다시 켜졌을 때 필요한 상태와 동작을 유지한다. 구독 해제·재연결이나 별도 상태 기계를 먼저 추가하지 말고 기존 흐름에서 해결할 수 있는지 확인한다.
+- Build only what was asked. If a feature, option, generalization, defensive code, or refactoring outside the request seems necessary, say what you want to add and why, and get approval before adding it.
+- The callers, tests, fixtures, and documents the change must reach are part of the request. Do not leave them out.
+- Before finishing, revert your own edits outside the request. If one turned out to be needed, report it and why. Never touch changes you did not make.
+- When the work needs a change with a wide blast radius that the request did not call for, such as actor isolation across several types, a public contract, or a stored format, announce it and get approval before making it.
+- If asked only for a design, do not implement. If told to stop, stop at once.
+- Do not fix a symptom by guessing while its root cause is unconfirmed. Before adding code that hides a symptom, find the root cause in the whole code path and fix it there.
 
-## 이름·책임·제거 범위
+## The smallest complete change
 
-- 함수·인자·타입 이름에 실제 동작과 조건이 드러나게 한다. 상태 변경 책임과 callback을 호출해야 하는 조건을 명확히 하고 관련 구현을 그 책임을 가진 위치에 둔다.
-- 동작을 제거하라는 요청이면 같은 동작을 다른 계층으로 옮겨 남기지 않는다. 연결만 해제하라는 요청이면 다시 연결할 구현 정의까지 삭제하지 않는다.
-- 요청 범위 안의 미사용 API만 외부 사용 여부와 유지해야 할 계약을 확인한 뒤 정리한다. 주변 미사용 API까지 변경 범위를 넓히지 않는다. `public`이나 `package`라는 이유만으로 호환 코드를 남기거나, 현재 호출부가 없다는 이유만으로 삭제하지 않는다.
-- 저장소에서 생성하는 산출물은 관리되는 생성 도구와 입력을 통해 고쳐 재생성 시에도 수정이 유지되게 한다.
+Take the first of these that works.
 
-## 기술 설명과 변경 요약
+1. Does it need to exist? First see whether removing an option, branch, or feature makes the control flow simpler. If it looks removable, ask the user.
+2. Does it already exist? Check the affected call paths and which type owns the data and state, and use the existing function, type, constant, default, or fallback that does the same job. Do not build a near-copy; add a missing capability to the module that owns it.
+3. Does the standard library or a platform API do it? Use that. Do not adopt a general-purpose component for capabilities this code does not need.
+4. If it is still needed, write the minimum that works.
 
-- 주석, 설계 설명, 작업 보고에서 특정 타입·함수·프로퍼티를 가리킬 때는 실제 식별자를 그대로 쓴다. `PlaybackSession`을 “재생 세션”으로 바꾸는 등 대상을 다시 추측해야 하는 번역이나 일반화는 피한다.
-- `IPC`, `actor`, `callback`처럼 익숙한 기술 용어는 그대로 쓴다. 한국어로 억지 번역해 의미를 흐리지 않는다.
-- 변경 요약은 대상과 실제 변경을 직접 쓴다. 예를 들어 “재생 세션 소유권 주석 정리” 대신 “PlaybackSession 주석 정리”라고 쓴다. 소유권·수명·경계 자체를 설명할 때는 누가 무엇을 생성·보관·해제하거나 변경하는지 구체적으로 적는다.
-- 커밋을 요청받으면 [movist-commit](../movist-commit/SKILL.md)을 읽고 커밋 절차와 메시지 규칙을 따른다.
+- Add an abstraction, defensive check, compatibility code, retry, cache, or rollback only when a current requirement, a real execution condition, or a contract that must hold explains why it is needed. Do use shared code that removes real duplication and makes responsibility clearer.
+- Do not add code that defends against a failure that almost never happens or after which the end user can simply try again. Surface the failure and return without attempting recovery: an alert when the end user started the operation, a log otherwise. Keep what must hold on failure paths too, such as releasing resources.
+- Do not add types, protocols, parameters, or indirection for speculative callers or platforms the product does not target. Keep the ones a planned feature will use.
+- Do not add a version, migration, or compatibility code to a stored format that has never shipped or to an API used only inside the repository. Give a new serialized field whose absence is valid an Optional type or a decoding default.
+- When macOS and iOS can handle something as the same concept, write shared code. Leave a special case that exists on only one platform as a simple fallback.
+- When asked for the same behavior as Movist 2, the shipped app kept in the repository's `__original/`, check the feature's settings, order of operations, and state transitions there. Follow the behavior without dropping or widening it, but find the simplest implementation in the current code.
+- If product code grew after the change, check again that all of the added code is needed. If code grew in a change meant to simplify, report why.
 
-## 문서 갱신
+## CPU cost and simpler control flow
 
-- 코드 변경이 public·package 계약, caller에게 보이는 동작이나 wire 계약을 바꾸면 그 owner 문서(`Docs/3.0`의 해당 `*API.md`·`*Spec.md`)를 그 문서의 수준으로 고치고 다른 문서는 건드리지 않는다. 상태나 완료 조건이 바뀌면 `Docs/3.0/Migration-Plan.md`의 해당 영역 행을 함께 고친다. 구현하는 기능에 Migration Plan이 링크한 `Docs/Working` 작업 문서가 있으면 그 문서의 관련 절을 먼저 읽고, 단계 코드가 들어가는 커밋에서 구현된 계약은 API 문서로, 결정은 Design 문서로 옮긴 뒤 작업 문서에서 그 부분과 끝난 단계를 지운다. 검증 결과는 작업 보고에만 쓰고, 남는 결함·한계는 `Docs/Issues`에 `처리` 값과 함께 적는다. Issues 항목을 고쳤으면 같은 커밋에서 그 항목을 `해결된 항목` 표로 옮기고 커밋 hash는 적지 않는다.
+- On playback hot paths the priority is: lower CPU load in the real app → simpler control flow → less code → easier review. Judge in this order while keeping the feature correct and the lifetime and concurrency invariants intact. Do not, in order to cut lines, add copies, allocations, thread or actor hops, synchronization, or work done inside callbacks on a playback hot path, gather unrelated responsibilities in one object, put several statements on one line with semicolons, or write terse code that needs decoding.
+- Judge the value of a CPU optimization by how call frequency and per-call cost affect the real app's CPU load. Put first the paths with large accumulated cost, such as playback hot paths. Do not assume a new API or library path is more efficient.
+- Do not complicate the control flow or blur the boundaries of responsibility and object lifetime to save a one-time cost or for a gain that is negligible in the real app. Examples are hand-inlining a function or condensing a calculation the compiler can optimize, and merging function layers that should stay separate. Object initialization at seek, video start, and video end is an example of one-time cost.
+- Reduce duplicate defaults, stored state that can be derived from other state, booleans that must stay in sync, pass-through wrappers, arguments that can be computed from an object already held, and extra call layers.
+- When cutting needless repeated work of hidden UI or a disabled feature, keep the state and behavior needed when it is turned back on. Before adding unsubscribe and resubscribe or a separate state machine, check whether the existing code path can solve it.
 
-## 주석
+## Names, responsibility, and removal scope
 
-- 코드에서 드러나는 동작을 되풀이하는 주석은 추가하지 않는다. lock, cancellation, ownership, 외부·플랫폼 동작, API 계약, 호환성처럼 코드만으로 알기 어려운 제약과 이유는 보존하거나 설명한다. 저작권 헤더, shebang, formatter/linter 지시문은 원래 형식을 따른다.
-- 한국어로 쓴다. 영어가 명백히 더 명확하면 새 주석도 영어로 쓰고 기존 영어 주석도 유지한다. 한 문장은 한 줄에 쓰고 여러 `///` 줄로 나누지 않는다.
-- 타입 주석은 관리 대상과 역할부터 설명한다. `identity`, `generation`, “보호 상태”만 나열하지 않는다.
-- 동작 주석은 실제 함수·상태에 연결해 조건, 순서, 이유를 설명한다. 기술적 정확성을 유지하고 불분명한 직역은 피한다.
+- Make function, argument, and type names show the real behavior and conditions. Make clear who is responsible for a state change and under what condition a callback must be called, and put the implementation where that responsibility lives.
+- Do not add implementation to a type that already receives many actions and callbacks, such as a document or app delegate, just because it is convenient. Put it in the type that owns the job, or ask where it should go if no such type exists.
+- Represent kinds of values with types, not strings. Do not merge values with different meanings into one case such as `.other`.
+- Do not hard-code a tuning value where it is used; name it and define it once. Register setting defaults in one place.
+- Do not add a keyword or construct whose effect you cannot explain. Examples are `nonisolated` and `withExtendedLifetime` when you cannot say what goes wrong without them.
+- When asked to remove a behavior, do not keep the same behavior by moving it to another layer. When asked only to disable or detach something, do not delete the implementation needed to use it again.
+- Clean up only unused APIs inside the requested scope, after checking external use and contracts that must hold. Do not widen the change to unused APIs nearby. Do not keep compatibility code just because something is `public` or `package`, and do not delete something just because it has no caller now.
+- Correct artifacts the repository generates by changing the generator and inputs tracked in the repository, so the correction survives regeneration.
 
-## 변경에 맞는 검증
+## Logs, diagnostics, and test-only code
 
-- 변경한 동작과 영향받는 플랫폼에 필요한 검증을 선택한다. 사용자가 코드 수정만 요청하거나 앱 검증을 맡겠다고 한 경우에는 그 경계를 지킨다. 완료한 검증은 입력이 바뀌거나 새로운 우려가 생겼을 때만 반복한다.
-- 매 변경마다 전체 빌드·서명·기기 검증·CPU 측정을 의무화하지 않는다. Release 앱 CPU를 반복 측정·비교할 때는 사용할 수 있는 `movist-cpu-benchmark` 스킬의 절차를 따른다. 측정하지 않은 비용 개선은 추정으로 구분한다.
+- Log only what is needed to confirm the cause when a problem occurs. Do not add a timer for logging, accumulated statistics, or a test of the enabled flag on every call of a playback hot path.
+- Separate logging and diagnostic code that stays in the product into extension files named `<Type>+Debug.swift` so it does not obscure the product code.
+- Remove temporary instrumentation and experimental changes when the investigation ends. When experimenting, disable product code temporarily instead of deleting it.
+- Keep code used only by tests in the test target.
+
+## Technical writing and change summaries
+
+- In comments, design explanations, and work reports, refer to a specific type, function, or property by its real identifier. Avoid a translation or generalization that makes the reader guess the target, such as writing “재생 세션” for `PlaybackSession`.
+- Keep familiar technical terms such as `IPC`, `actor`, and `callback` as they are. Do not force a Korean translation that blurs the meaning.
+- Do not refer to something by a nickname made up during the work. Say which file or input, what the code does, and what the end user sees.
+- Write a change summary as the target and the actual change. For example, write “PlaybackSession 주석 정리”, not “재생 세션 소유권 주석 정리”. When explaining object lifetime or a responsibility boundary itself, say concretely who creates, holds, releases, or changes what.
+- Commit only when the user says so. When asked to commit, read and follow [movist-commit](../movist-commit/SKILL.md). When asked to review, read and follow [movist-review](../movist-review/SKILL.md).
+
+## Document updates
+
+- This applies in a repository that has the documents named here. When a code change alters a public or package contract, behavior visible to callers, or a wire contract, update its owner document (the matching `*API.md` or `*Spec.md` in `Docs/3.0`) at that document's level of detail and touch no other document. When status or completion conditions change, update the matching area row of `Docs/3.0/Migration-Plan.md` too. If the feature being implemented has a `Docs/Working` document linked from the Migration Plan, read its relevant sections first; in the commit that carries a step's code, move the implemented contract to the API document and the decision to the Design document, then delete that part and the finished step from the working document. Write verification results only in the work report, and record remaining defects and limits in `Docs/Issues` with a `처리` value. When you fix an Issues entry, move it to the `해결된 항목` table in the same commit and do not write the commit hash.
+
+## Comments
+
+- Do not add a comment that repeats what the code shows. Keep or explain constraints and reasons the code alone does not show, such as locks, cancellation, object lifetime, external or platform behavior, API contracts, and compatibility. Keep copyright headers, shebangs, and formatter or linter directives in their original form.
+- Write comments in Korean. If English is clearly clearer, write the new comment in English too, and keep existing English comments. Write one sentence on one line; do not split it across several `///` lines.
+- A type comment starts with what the type manages and its role. Do not just list `identity`, `generation`, or “보호 상태”.
+- A behavior comment ties to the real function and state and explains the condition, order, and reason. Stay technically accurate and avoid unclear literal translation.
+
+## Verification that fits the change
+
+- Choose the verification the changed behavior and the affected platforms need. When the user asked only for code changes or said they will verify the app, keep to that boundary. Repeat finished verification only when its input changed or a new concern arose.
+- Run only the test methods that execute the changed code. Do not retest areas that did not change.
+- Verify what you can verify yourself instead of handing it to the user. Check the running app through the IPC or command line the repository provides, and avoid operations that take over the user's screen and keyboard.
+- Report separately what a successful build or test shows and what was confirmed on screen, in sound, or on a device. Mark what was not confirmed as unverified.
+- Do not ask for measurement on a question that reasoning about the design decides, where measuring adds nothing. Do not require a full build, signing, device verification, or CPU measurement for every change. When measuring and comparing Release app CPU repeatedly, follow the available `movist-cpu-benchmark` skill. Mark a cost improvement that was not measured as an estimate.

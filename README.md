@@ -2,11 +2,14 @@
 
 Movist 개발, 커밋, 브랜치 통합과 Movist Pro 릴리스 노트 작업에 쓰는
 Agent Skills 모음입니다. 각 skill은 독립 폴더로 설치되지만, 서로 참조하는
-작업 흐름이 있어 다섯 개를 함께 설치하는 방식을 권장합니다.
+작업 흐름이 있어 여섯 개를 함께 설치하는 방식을 권장합니다.
 
 ## 포함된 skill
 
-- `movist-code`: 기존 구현 재사용과 CPU 비용을 우선하는 Movist 구현 절차
+- `movist-code`: 요청한 것만 가장 단순하게 구현하고 기존 구현 재사용과 CPU 비용을
+  우선하는 Movist 구현 절차
+- `movist-review`: 정해진 차단 기준으로 변경을 판정하고 재리뷰는 바뀐 줄만 보는
+  Movist 리뷰 절차
 - `movist-commit`: 관련 변경만 골라 커밋하는 Movist 커밋 절차
 - `movist-ff-main`: 커밋 후 로컬 `main`에 rebase하고 fast-forward 병합
 - `movist-changelog`: 승인 기반 Movist Pro 다국어 릴리스 노트 절차
@@ -23,24 +26,38 @@ Agent Skills CLI가 지원하는 agent와 설치할 skill을 대화식으로 선
 npx skills add movistprime/movist-skills
 ```
 
-다섯 skill을 사용자 범위에 설치하려면 다음과 같이 실행합니다.
+여섯 skill을 사용자 범위에 설치하려면 다음과 같이 실행합니다.
 
 ```sh
 npx skills add movistprime/movist-skills --skill '*' -g
 ```
 
 하나만 설치하려면 `--skill <name>`을 지정합니다. 다만
-`movist-code`와 `movist-ff-main`은 `movist-commit`을 참조하므로 함께
-설치해야 전체 흐름이 동작합니다.
+`movist-code`와 `movist-ff-main`은 `movist-commit`을, `movist-review`는
+`movist-code`와 `movist-commit`을 참조하므로 함께 설치해야 전체 흐름이
+동작합니다.
 
 설치된 skill은 Agent Skills CLI로 갱신합니다.
 
 ```sh
-npx skills update movist-code movist-commit movist-ff-main movist-changelog movist-docs -g
+npx skills update movist-code movist-review movist-commit movist-ff-main movist-changelog movist-docs -g
 ```
 
 각 폴더의 `SKILL.md`는 공통 Agent Skills 형식입니다. `agents/openai.yaml`은
 OpenAI agent의 표시 metadata이며 skill 동작은 이 파일에 의존하지 않습니다.
+
+## 한국어 번역본
+
+`movist-code`와 `movist-review`의 `SKILL.md`는 영어로 씁니다. 사람이 내용을
+확인할 수 있도록 `ko/<skill 이름>.md`에 한국어 번역본을 둡니다. 번역본은
+skill로 설치되지 않습니다.
+
+- 원문을 고치면 같은 커밋에서 번역본도 고칩니다.
+- 번역본 첫 줄에는 번역할 때의 원문 sha256이 적혀 있습니다. 번역을 고친 뒤
+  `python3 scripts/check_ko.py --update`로 새로 씁니다.
+- `python3 scripts/check_ko.py`는 원문이 바뀌었는데 번역본의 기록이 그대로면
+  실패합니다. clone마다 한 번 `git config core.hooksPath .githooks`를 실행하면
+  커밋할 때 자동으로 확인합니다.
 
 ## 실행 환경
 
