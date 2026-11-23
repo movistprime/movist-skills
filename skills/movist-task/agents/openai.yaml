@@ -1,0 +1,4 @@
+interface:
+  display_name: "Movist Task"
+  short_description: "작업 보드에서 작업을 가져와 claim하고 확정받을 설계까지 보고하는 시작 절차"
+  default_prompt: "$movist-task로 보드에서 다음 일을 가져와 줘."
