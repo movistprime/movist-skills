@@ -1,4 +1,4 @@
-<!-- 원문: skills/movist-task/SKILL.md sha256=34495af3197b7e383ea07bf3615b975d84c299869600bbd6281a3405d63382d0 -->
+<!-- 원문: skills/movist-task/SKILL.md sha256=c8ec59ed78b5b4e10110401e8b5fcab6c14e28a2695a84ef627d037ea2481f04 -->
 # movist-task 한국어 번역
 
 설치되는 스킬은 영어 원문 `skills/movist-task/SKILL.md`이다. 이 파일은 내용을 확인하려고 둔 번역이며 원문과 같은 커밋에서 함께 고친다.
@@ -15,7 +15,7 @@
 
 1. 지시에 적힌 보드 사람으로만 claim한다. 사람을 추측하지 않는다.
 2. 보드에 쓰는 모든 시각은 그 쓰기 직전에 실행한 `date -u +%Y-%m-%dT%H:%M:%SZ`에서 얻는다. 시각을 어림하거나 앞서 얻은 시각을 다시 쓰지 않는다.
-3. 사용자가 설계를 확정하기 전에는 코드도 문서도 고치지 않는다. 이 스킬이 바꾸는 것은 rebase와 아래에 적힌 보드 쓰기뿐이다.
+3. 사용자가 설계를 확정하기 전에는 코드도 문서도 고치지 않는다. 이 스킬이 바꾸는 것은 rebase와 아래에 적힌 보드 쓰기, 세션 title뿐이다.
 
 ## 순서
 
@@ -26,7 +26,7 @@
    - 사용자가 key를 줬으면 그 작업을 가져온다. 그 작업이 `todo`가 아니거나, 아직 다른 작업을 기다리거나, 다른 사람이 owner이면 claim하지 않고 상태를 보고한 뒤 멈춘다.
    - 사용자가 key를 주지 않았으면, ready 작업에서 `meta/rules`가 가져오면 안 된다고 한 것과 다른 사람이 owner인 것을 빼고, key 번호가 가장 작은 것을 가져온다. 나머지 ready 작업은 보고에 한 줄씩 적는다.
    - 가져올 수 있는 작업이 없으면, 어느 작업이 진행 중인지와 기다리는 작업이 각각 무엇을 기다리는지 보고하고 멈춘다.
-5. `details/<key>`를 읽고, 보드 규칙대로 한 번의 batch로 작업을 claim한다. `claimedBy.session`에 worktree 이름을, `branch`에 현재 branch를 적는다. claim 메시지에는 어느 branch에서 일하는지와 무엇을 먼저 읽을지를 적는다. 다른 사람이 먼저 가져가 claim이 실패하면 4번으로 돌아간다.
+5. `details/<key>`를 읽고, 보드 규칙대로 한 번의 batch로 작업을 claim한다. `claimedBy.session`에 worktree 이름을, `branch`에 현재 branch를 적는다. claim 메시지에는 어느 branch에서 일하는지와 무엇을 먼저 읽을지를 적는다. 다른 사람이 먼저 가져가 claim이 실패하면 4번으로 돌아간다. claim이 성공하면, 현재 세션의 이름을 바꾸는 도구가 있을 때(예: `session_id`를 `self`로 주는 `set_session_title`) 세션 title을 작업 key와 보드 제목(`<key> <title>`)으로 바꾼다. 그런 도구가 없으면 건너뛴다.
 6. 작업에 필요한 것을 읽는다. `details`의 `spec` 위치에서 시작해, `AGENTS.md`가 그 영역의 작업 전에 읽으라고 한 문서를 읽고, source를 추적한다. 작업이 고칠 타입과 함수, 그 호출자, 관련 테스트다. 문서가 지금 동작을 설명하면 source에서 확인하고, 어긋나는 것을 모두 보고한다.
 7. 겹침을 확인한다. 다른 세션이 잡은 `doing`·`review` 작업마다, 이 작업이 고칠 파일을 그 작업의 `branch`에서 바뀐 파일(`git diff --name-only main...<branch>`)과 비교하고, 그 작업의 worktree가 이 기기에 있으면 미커밋 변경과도 비교한다. 겹치면 보고하기 전에 그 작업의 thread에 파일 이름을 적은 `note`를 올린다.
 8. [movist-code](movist-code.md)의 규칙으로 변경을 설계한다. 작업이 요구한 것만 만들고, 이미 있는 것을 쓰고, blast radius가 넓은 변경은 따로 밝힌다. 구현하지 않는다.

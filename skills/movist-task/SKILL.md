@@ -13,7 +13,7 @@ How to read and write the board is in the repository's board rules file, which t
 
 1. Claim only as the board person your instructions name. Never guess the person.
 2. Every timestamp you write to the board comes from `date -u +%Y-%m-%dT%H:%M:%SZ`, run immediately before that write. Never estimate a time or reuse an earlier one.
-3. Until the user confirms the design, change no code and no document. The only changes this skill makes are the rebase and the board writes named below.
+3. Until the user confirms the design, change no code and no document. The only changes this skill makes are the rebase, the board writes, and the session title named below.
 
 ## Steps
 
@@ -24,7 +24,7 @@ How to read and write the board is in the repository's board rules file, which t
    - If the user gave a key, take that task. If it is not `todo`, still waits on another task, or is owned by another person, do not claim it; report its state and stop.
    - If the user gave no key, drop the ready tasks that `meta/rules` says you must not take and the ones owned by another person, then take the one with the lowest key number. List the other ready tasks in the report, one line each.
    - If there is no task you may take, report which tasks are in progress and what each waiting task waits on, and stop.
-5. Read `details/<key>`, then claim the task in one batch as the board rules say. Put the worktree name in `claimedBy.session` and the current branch in `branch`. In the claim message, say which branch you work on and what you will read first. If the claim fails because someone else took the task, go back to step 4.
+5. Read `details/<key>`, then claim the task in one batch as the board rules say. Put the worktree name in `claimedBy.session` and the current branch in `branch`. In the claim message, say which branch you work on and what you will read first. If the claim fails because someone else took the task, go back to step 4. Once the claim succeeds, rename this session to the task's key and board title (`<key> <title>`) if you have a tool that renames the current session, such as `set_session_title` with `session_id` `self`. Without such a tool, skip this.
 6. Read what the task needs. Start from the `spec` location in `details`, read the documents `AGENTS.md` requires before work on that area, then trace the source: the types and functions the task will change, their callers, and the related tests. When a document describes the current behavior, confirm it in the source and report every mismatch.
 7. Check overlap. For each task in `doing` or `review` that another session holds, compare the files this task will change with the files changed on its `branch` (`git diff --name-only main...<branch>`) and, when its worktree is on this machine, with its uncommitted changes. If they overlap, post a `note` in that task's thread naming the files before you report.
 8. Design the change by the rules of [movist-code](../movist-code/SKILL.md): build only what the task asks, reuse what exists, and call out any change with a wide blast radius. Do not implement.
