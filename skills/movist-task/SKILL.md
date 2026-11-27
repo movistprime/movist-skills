@@ -27,7 +27,7 @@ How to read and write the board is in the repository's board rules file, which t
 5. Read `details/<key>`, then claim the task in one batch as the board rules say. Put the worktree name in `claimedBy.session` and the current branch in `branch`. In the claim message, say which branch you work on and what you will read first. If the claim fails because someone else took the task, go back to step 4. Once the claim succeeds, rename this session to the task's key and board title (`<key> <title>`) if you have a tool that renames the current session, such as `set_session_title` with `session_id` `self`. Without such a tool, skip this.
 6. Read what the task needs. Start from the `spec` location in `details`, read the documents `AGENTS.md` requires before work on that area, then trace the source: the types and functions the task will change, their callers, and the related tests. When a document describes the current behavior, confirm it in the source and report every mismatch.
 7. Check overlap. For each task in `doing` or `review` that another session holds, compare the files this task will change with the files changed on its `branch` (`git diff --name-only main...<branch>`) and, when its worktree is on this machine, with its uncommitted changes. If they overlap, post a `note` in that task's thread naming the files before you report.
-8. Design the change by the rules of [movist-code](../movist-code/SKILL.md): build only what the task asks, reuse what exists, and call out any change with a wide blast radius. Do not implement.
+8. Design the change by the rules of [movist-code](../movist-code/SKILL.md): build only what the task asks, reuse what exists, work out both the smallest change and the simplest result, and call out any change with a wide blast radius. Do not implement.
 9. Post the proposal in the task's thread in at most three lines: type `question` when the user must decide something, `update` otherwise. Then report and stop.
 
 ## Report
@@ -37,10 +37,10 @@ Write the report in Korean. Refer to types, functions, and properties by their r
 - First line: the task key and title, and the kind of work: `코드 변경`, `문서만`, or `결정만`. State the kind before anything else, so the user knows whether there is code to change.
 - `작업 위치:` the worktree path, the branch, and what the rebase did (from which commit to which, or already up to date).
 - `지금 동작:` what the source shows, with `file:line`. Include mismatches between the documents and the source.
-- `제안:` the design. For each decision, say what changes for the end user.
-- `고칠 곳:` the types, files, and documents to change. Mark a change to a public or package contract, a stored format, or actor isolation.
+- `제안:` the design. For each decision, say what changes for the end user. When the smallest change and the simplest result differ, give both as `최소 수정안` and `단순 흐름안`, and for each say what it changes and how the control flow reads afterward.
+- `고칠 곳:` the types, files, and documents to change. Mark a change to a public or package contract, a stored format, or actor isolation. When the two designs differ, list this per design.
 - `겹치는 작업:` the task key, its holder, and the shared files. Give the choices: go on and coordinate in the thread, or release this task and take the next one.
-- `정하실 것:` what only the user can decide, each with your recommendation.
+- `정하실 것:` what only the user can decide, each with your recommendation. When the two designs differ, the choice between them comes first.
 - `확인 못 한 것:` one line each.
 - `이 작업 뒤:` the tasks that have this one in `deps` and what else each still waits on. If the user gave no key, the other ready tasks.
 

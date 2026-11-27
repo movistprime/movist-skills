@@ -40,6 +40,17 @@ Take the first of these that works.
 - When asked for the same behavior as Movist 2, the shipped app kept in the repository's `__original/`, check the feature's settings, order of operations, and state transitions there. Follow the behavior without dropping or widening it, but find the simplest implementation in the current code.
 - If product code grew after the change, check again that all of the added code is needed. If code grew in a change meant to simplify, report why.
 
+## Smallest change and simplest result
+
+Work out two designs before you edit or report a design. Each does everything the request needs and nothing beyond it.
+
+- Smallest change: the fewest edits to the code as it stands.
+- Simplest result: the code whose control flow is simplest once the change is in, even when that means rewriting more of the existing code.
+
+If the two come out the same, go on without asking. If they differ, stop before editing, report both, and let the user choose. For each, say what it changes and how the control flow reads afterward, and mark any change with a wide blast radius. Give your recommendation. Do not merge them into a compromise, and do not drop one because you prefer the other.
+
+The user's choice of the simplest result approves the rewriting that design needs and nothing else outside the request. When the user has already chosen or confirmed a design for this change, do not ask again.
+
 ## CPU cost and simpler control flow
 
 - On playback hot paths the priority is: lower CPU load in the real app → simpler control flow → less code → easier review. Judge in this order while keeping the feature correct and the lifetime and concurrency invariants intact. Do not, in order to cut lines, add copies, allocations, thread or actor hops, synchronization, or work done inside callbacks on a playback hot path, gather unrelated responsibilities in one object, put several statements on one line with semicolons, or write terse code that needs decoding.
